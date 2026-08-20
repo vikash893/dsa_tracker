@@ -19,6 +19,7 @@
     "clean": "turbo run clean && rimraf node_modules"
   },
   "devDependencies": {
+    "@types/node": "^22.15.0",
     "turbo": "^2.5.0",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3"
