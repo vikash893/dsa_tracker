@@ -128,14 +128,14 @@ async function personalAnalytics(req: Request, res: Response, next: NextFunction
 
 async function userAnalytics(req: Request, res: Response, next: NextFunction) {
   try {
-    const data = await getPersonalAnalytics(req.params.id);
+    const data = await getPersonalAnalytics(req.params.id as string);
     res.json({ success: true, data });
   } catch (error) { next(error); }
 }
 
 async function groupAnalytics(req: Request, res: Response, next: NextFunction) {
   try {
-    const members = await GroupMember.find({ groupId: req.params.id }).populate('userId', 'firstName lastName email');
+    const members = await GroupMember.find({ groupId: req.params.id as string }).populate('userId', 'firstName lastName email');
     const memberAnalytics = await Promise.all(
       members.map(async (m) => {
         const analytics = await getPersonalAnalytics(m.userId.toString());

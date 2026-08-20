@@ -165,7 +165,7 @@ export class QuestionService {
     let imported = 0;
     let duplicates = 0;
     let failed = 0;
-    const importErrors: { row: number; title?: string; message: string }[] = [...parseResult.errors.map(e => ({ ...e, title: undefined }))];
+    const importErrors: { row: number; title?: string; message: string }[] = parseResult.errors.map(e => ({ row: e.row, message: e.message }));
 
     for (let i = 0; i < parseResult.questions.length; i++) {
       const q = parseResult.questions[i]!;

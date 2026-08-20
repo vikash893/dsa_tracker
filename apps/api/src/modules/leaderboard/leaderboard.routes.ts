@@ -33,7 +33,7 @@ async function calculateLeaderboard(userIds?: string[], dateFilter?: { $gte: Dat
   if (dateFilter) matchStage.submittedAt = dateFilter;
 
   // Aggregate accepted submissions grouped by user + question (deduplicate)
-  const pipeline: unknown[] = [
+  const pipeline: any[] = [
     { $match: matchStage },
     { $group: {
       _id: { userId: '$userId', questionId: '$questionId' },

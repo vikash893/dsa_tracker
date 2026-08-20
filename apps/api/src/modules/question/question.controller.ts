@@ -32,21 +32,21 @@ export class QuestionController {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const question = await questionService.getById(req.params.id);
+      const question = await questionService.getById(req.params.id as string);
       res.json({ success: true, data: question });
     } catch (error) { next(error); }
   }
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const question = await questionService.update(req.params.id, req.body, req.user!);
+      const question = await questionService.update(req.params.id as string, req.body, req.user!);
       res.json({ success: true, data: question });
     } catch (error) { next(error); }
   }
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await questionService.delete(req.params.id, req.user!);
+      await questionService.delete(req.params.id as string, req.user!);
       res.json({ success: true, message: 'Question deleted' });
     } catch (error) { next(error); }
   }
@@ -124,21 +124,21 @@ export class QuestionController {
 
   async getSet(req: Request, res: Response, next: NextFunction) {
     try {
-      const set = await questionService.getSet(req.params.id);
+      const set = await questionService.getSet(req.params.id as string);
       res.json({ success: true, data: set });
     } catch (error) { next(error); }
   }
 
   async updateSet(req: Request, res: Response, next: NextFunction) {
     try {
-      const set = await questionService.updateSet(req.params.id, req.body, req.user!);
+      const set = await questionService.updateSet(req.params.id as string, req.body, req.user!);
       res.json({ success: true, data: set });
     } catch (error) { next(error); }
   }
 
   async deleteSet(req: Request, res: Response, next: NextFunction) {
     try {
-      await questionService.deleteSet(req.params.id);
+      await questionService.deleteSet(req.params.id as string);
       res.json({ success: true, message: 'Question set deleted' });
     } catch (error) { next(error); }
   }

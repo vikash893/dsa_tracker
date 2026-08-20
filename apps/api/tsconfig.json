@@ -3,11 +3,12 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
+    "declaration": false,
+    "declarationMap": false,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "strictNullChecks": false,
+    "useUnknownInCatchVariables": false
   },
-  "include": ["src/**/*"],
-  "references": [
-    { "path": "../../packages/types" }
-  ]
+  "include": ["src/**/*"]
 }

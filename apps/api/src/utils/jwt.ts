@@ -12,7 +12,7 @@ import { env } from '../config/env.js';
  */
 export function signAccessToken(payload: JwtPayload): string {
   return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
-    expiresIn: env.JWT_ACCESS_EXPIRY,
+    expiresIn: env.JWT_ACCESS_EXPIRY as any,
   });
 }
 
@@ -21,7 +21,7 @@ export function signAccessToken(payload: JwtPayload): string {
  */
 export function signRefreshToken(payload: JwtPayload): string {
   return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
-    expiresIn: env.JWT_REFRESH_EXPIRY,
+    expiresIn: env.JWT_REFRESH_EXPIRY as any,
   });
 }
 

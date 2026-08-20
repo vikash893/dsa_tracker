@@ -26,21 +26,21 @@ export class GroupController {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const group = await groupService.getById(req.params.id, req.user!._id.toString(), req.user!.role);
+      const group = await groupService.getById(req.params.id as string, req.user!._id.toString(), req.user!.role);
       res.json({ success: true, data: group });
     } catch (error) { next(error); }
   }
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const group = await groupService.update(req.params.id, req.body, req.user!);
+      const group = await groupService.update(req.params.id as string, req.body, req.user!);
       res.json({ success: true, data: group });
     } catch (error) { next(error); }
   }
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await groupService.delete(req.params.id, req.user!);
+      await groupService.delete(req.params.id as string, req.user!);
       res.json({ success: true, message: 'Group deleted' });
     } catch (error) { next(error); }
   }
@@ -48,14 +48,14 @@ export class GroupController {
   async addMember(req: Request, res: Response, next: NextFunction) {
     try {
       const role = (req.body.role as GroupRole) || GroupRole.MEMBER;
-      const member = await groupService.addMember(req.params.id, req.body.userId, role, req.user!);
+      const member = await groupService.addMember(req.params.id as string, req.body.userId, role, req.user!);
       res.status(201).json({ success: true, data: member });
     } catch (error) { next(error); }
   }
 
   async removeMember(req: Request, res: Response, next: NextFunction) {
     try {
-      await groupService.removeMember(req.params.id, req.params.uid, req.user!);
+      await groupService.removeMember(req.params.id as string, req.params.uid as string, req.user!);
       res.json({ success: true, message: 'Member removed' });
     } catch (error) { next(error); }
   }

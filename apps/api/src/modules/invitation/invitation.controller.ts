@@ -26,14 +26,14 @@ export class InvitationController {
 
   async getByToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const invitation = await invitationService.getByToken(req.params.token);
+      const invitation = await invitationService.getByToken(req.params.token as string);
       res.json({ success: true, data: invitation });
     } catch (error) { next(error); }
   }
 
   async accept(req: Request, res: Response, next: NextFunction) {
     try {
-      const { user } = await invitationService.accept(req.params.token, req.body);
+      const { user } = await invitationService.accept(req.params.token as string, req.body);
       res.json({
         success: true,
         message: 'Invitation accepted. You can now login.',
@@ -44,7 +44,7 @@ export class InvitationController {
 
   async revoke(req: Request, res: Response, next: NextFunction) {
     try {
-      await invitationService.revoke(req.params.id, req.user!);
+      await invitationService.revoke(req.params.id as string, req.user!);
       res.json({ success: true, message: 'Invitation revoked' });
     } catch (error) { next(error); }
   }
