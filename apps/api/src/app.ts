@@ -56,12 +56,32 @@ const app = express();
 
 // ─── Security ───────────────────────────────────────────────
 app.use(helmet());
+
+const allowedOrigins = [
+  env.FRONTEND_URL,
+  'https://dsatracker-web.onrender.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
 app.use(
   cors({
-    origin: [env.FRONTEND_URL],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, extension background worker)
+      if (!origin) return callback(null, true);
+
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.onrender.com') ||
+        origin.startsWith('chrome-extension://')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   }),
 );
 
