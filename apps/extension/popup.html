@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSATracker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login View -->
+    <div id="login-view" class="view">
+      <div class="logo">🏆</div>
+      <h1>DSATracker</h1>
+      <p class="subtitle">Competitive Programming Tracker</p>
+      <form id="login-form">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit" id="login-btn">Sign In</button>
+        <p id="login-error" class="error"></p>
+      </form>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="view hidden">
+      <header>
+        <div class="user-info">
+          <span class="avatar" id="user-avatar">👤</span>
+          <div>
+            <h2 id="user-name">User</h2>
+            <span class="badge" id="user-role">USER</span>
+          </div>
+        </div>
+        <button id="logout-btn" class="icon-btn" title="Logout">⏻</button>
+      </header>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-value" id="stat-solved">0</span>
+          <span class="stat-label">Solved</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-streak">0</span>
+          <span class="stat-label">Streak 🔥</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-accuracy">0%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-xp">0</span>
+          <span class="stat-label">XP</span>
+        </div>
+      </div>
+
+      <!-- Active Session -->
+      <div id="session-card" class="session-card hidden">
+        <div class="session-header">
+          <span>⏱️ Active Session</span>
+          <span id="session-timer">00:00</span>
+        </div>
+        <p id="session-problem">—</p>
+        <div class="session-actions">
+          <button id="pause-btn" class="btn-sm">⏸ Pause</button>
+          <button id="end-btn" class="btn-sm btn-danger">⏹ End</button>
+        </div>
+      </div>
+
+      <!-- Pending Assignments -->
+      <div class="section">
+        <h3>📋 Pending Assignments</h3>
+        <div id="assignments-list" class="list">
+          <p class="empty">No pending assignments</p>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="quick-links">
+        <a href="https://leetcode.com/problemset/" target="_blank" class="platform-link lc">LC</a>
+        <a href="https://codeforces.com/problemset" target="_blank" class="platform-link cf">CF</a>
+        <a href="https://www.codechef.com/practice" target="_blank" class="platform-link cc">CC</a>
+        <a href="https://www.geeksforgeeks.org/explore" target="_blank" class="platform-link gfg">GFG</a>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

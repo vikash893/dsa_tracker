@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "DSATracker",
+  "description": "Competitive Programming Tracker — Track your solving sessions on LeetCode, Codeforces, CodeChef, and GFG",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "tabs",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://codeforces.com/*",
+    "https://www.codechef.com/*",
+    "https://practice.geeksforgeeks.org/*",
+    "https://www.geeksforgeeks.org/*",
+    "http://localhost:5000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/problems/*"],
+      "js": ["content-scripts/leetcode.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://codeforces.com/problemset/problem/*", "https://codeforces.com/contest/*/problem/*"],
+      "js": ["content-scripts/codeforces.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.codechef.com/problems/*", "https://www.codechef.com/submit/*"],
+      "js": ["content-scripts/codechef.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://practice.geeksforgeeks.org/problems/*", "https://www.geeksforgeeks.org/problems/*"],
+      "js": ["content-scripts/gfg.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

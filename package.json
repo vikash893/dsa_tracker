@@ -1,0 +1,31 @@
+{
+  "name": "dsa-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Competitive Programming Tracker Platform — Chrome Extension + MERN Stack",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "dev:api": "turbo run dev --filter=@dsa-tracker/api",
+    "dev:web": "turbo run dev --filter=@dsa-tracker/web",
+    "build:api": "turbo run build --filter=@dsa-tracker/api",
+    "seed": "npm run seed --workspace=apps/api",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "npm@10.9.3",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
