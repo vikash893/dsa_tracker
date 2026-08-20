@@ -2,7 +2,7 @@
 // DSATracker Chrome Extension — Background Service Worker
 // ============================================================
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://dsatracker-api-u457.onrender.com/api';
 
 // ─── Token Management ───────────────────────────────────────
 

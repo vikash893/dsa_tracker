@@ -15,6 +15,7 @@
     "https://www.codechef.com/*",
     "https://practice.geeksforgeeks.org/*",
     "https://www.geeksforgeeks.org/*",
+    "https://dsatracker-api-u457.onrender.com/*",
     "http://localhost:5000/*"
   ],
   "action": {
