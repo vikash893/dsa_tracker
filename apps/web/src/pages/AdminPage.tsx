@@ -1,25 +1,43 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import AddQuestionsModal from '../components/AddQuestionsModal';
 
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchAdminData = () => {
     Promise.all([
       api('/admin/stats').then((res) => setStats(res.data)).catch(() => {}),
       api('/admin/audit-logs').then((res) => setLogs(res.data || [])).catch(() => setLogs([])),
     ]).finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchAdminData();
   }, []);
 
   if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
 
   return (
     <>
-      <div className="page-header">
-        <h1>⚙️ Admin Dashboard</h1>
-        <p>Platform overview and audit trail</p>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1>⚙️ Admin Dashboard</h1>
+          <p>Platform overview, quick actions, and audit trail</p>
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
+            ➕ Add Questions
+          </button>
+          <button className="btn btn-secondary" onClick={() => navigate('/admin/users')}>
+            👥 Manage Users
+          </button>
+        </div>
       </div>
 
       <div className="stats-grid">
@@ -70,6 +88,13 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      <AddQuestionsModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={fetchAdminData}
+      />
     </>
   );
 }
+

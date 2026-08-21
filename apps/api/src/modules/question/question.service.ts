@@ -11,7 +11,14 @@ import { detectPlatformFromUrl } from '../../utils/platformDetector.js';
 import { parseCsvContent } from '../../utils/fileParser.js';
 import { AuditAction, Difficulty, Platform } from '@dsa-tracker/types';
 import { PAGINATION, DEFAULT_SCORING } from '../../config/constants.js';
-import type { CreateQuestionInput, UpdateQuestionInput, ImportUrlInput, CreateQuestionSetInput } from './question.validation.js';
+import type {
+  CreateQuestionInput,
+  UpdateQuestionInput,
+  ImportUrlInput,
+  CreateQuestionSetInput,
+  BulkCreateQuestionsInput,
+  ImportBulkUrlsInput,
+} from './question.validation.js';
 import type { IUserDoc } from '../../models/User.js';
 
 export class QuestionService {
@@ -41,6 +48,101 @@ export class QuestionService {
     });
 
     return question;
+  }
+
+  async createBulk(data: BulkCreateQuestionsInput, user: IUserDoc) {
+    const rawQuestions: CreateQuestionInput[] = Array.isArray(data) ? data : data.questions;
+    const created: IQuestionDoc[] = [];
+    const errors: { index: number; title?: string; message: string }[] = [];
+    let duplicates = 0;
+    let failed = 0;
+
+    for (let i = 0; i < rawQuestions.length; i++) {
+      const item = rawQuestions[i]!;
+      try {
+        let { platform, externalProblemId, title, problemUrl } = item;
+        let slug: string | undefined = undefined;
+
+        // Auto-detect platform and external problem details if URL is provided
+        if (problemUrl && (!platform || platform === 'CUSTOM' || !externalProblemId)) {
+          const detected = detectPlatformFromUrl(problemUrl);
+          if (detected) {
+            platform = detected.platform;
+            externalProblemId = detected.externalProblemId;
+            if (detected.slug) slug = detected.slug;
+            if (!title && detected.title) title = detected.title;
+          }
+        }
+
+        // Duplicate check by platform + externalProblemId
+        if (externalProblemId && platform !== 'CUSTOM') {
+          const existing = await Question.findOne({ platform, externalProblemId });
+          if (existing) {
+            duplicates++;
+            continue;
+          }
+        }
+
+        // Duplicate check by title + platform
+        if (title) {
+          const titleDup = await Question.findOne({
+            title: { $regex: `^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
+            platform,
+          });
+          if (titleDup) {
+            duplicates++;
+            continue;
+          }
+        }
+
+        const difficulty = item.difficulty || Difficulty.MEDIUM;
+        const points = item.points ?? DEFAULT_SCORING.difficultyPoints[difficulty as keyof typeof DEFAULT_SCORING.difficultyPoints] ?? 0;
+
+        const question = await Question.create({
+          ...item,
+          title: title || 'Untitled Problem',
+          platform: platform || Platform.CUSTOM,
+          externalProblemId,
+          slug,
+          difficulty,
+          points,
+          createdBy: user._id,
+        });
+
+        created.push(question);
+      } catch (err) {
+        failed++;
+        errors.push({
+          index: i + 1,
+          title: item.title,
+          message: err instanceof Error ? err.message : 'Unknown error',
+        });
+      }
+    }
+
+    if (created.length > 0) {
+      await AuditLog.create({
+        actorId: user._id,
+        action: AuditAction.QUESTIONS_IMPORTED,
+        targetType: 'Question',
+        metadata: {
+          source: 'bulk_create',
+          count: created.length,
+          duplicates,
+          failed,
+          total: rawQuestions.length,
+        },
+      });
+    }
+
+    return {
+      imported: created.length,
+      duplicates,
+      failed,
+      total: rawQuestions.length,
+      questions: created,
+      errors,
+    };
   }
 
   async list(filters: {
@@ -155,6 +257,95 @@ export class QuestionService {
     });
 
     return { question, detected };
+  }
+
+  async importBulkUrls(data: ImportBulkUrlsInput, user: IUserDoc) {
+    const created: IQuestionDoc[] = [];
+    const errors: { index: number; url: string; message: string }[] = [];
+    let duplicates = 0;
+    let failed = 0;
+
+    const difficulty = data.defaultDifficulty || Difficulty.MEDIUM;
+    const points = data.points ?? DEFAULT_SCORING.difficultyPoints[difficulty as keyof typeof DEFAULT_SCORING.difficultyPoints] ?? 0;
+
+    for (let i = 0; i < data.urls.length; i++) {
+      const url = data.urls[i]!.trim();
+      if (!url) continue;
+
+      try {
+        const detected = detectPlatformFromUrl(url);
+        if (!detected) {
+          failed++;
+          errors.push({ index: i + 1, url, message: 'Could not detect platform from URL' });
+          continue;
+        }
+
+        // Duplicate check by platform + externalProblemId
+        if (detected.externalProblemId) {
+          const existing = await Question.findOne({
+            platform: detected.platform,
+            externalProblemId: detected.externalProblemId,
+          });
+          if (existing) {
+            duplicates++;
+            continue;
+          }
+        }
+
+        // Duplicate check by problemUrl
+        const existingByUrl = await Question.findOne({ problemUrl: url });
+        if (existingByUrl) {
+          duplicates++;
+          continue;
+        }
+
+        const question = await Question.create({
+          title: detected.title || 'Untitled Problem',
+          slug: detected.slug,
+          platform: detected.platform,
+          problemUrl: url,
+          externalProblemId: detected.externalProblemId,
+          difficulty,
+          topics: data.topics || [],
+          companies: data.companies || [],
+          points,
+          createdBy: user._id,
+        });
+
+        created.push(question);
+      } catch (err) {
+        failed++;
+        errors.push({
+          index: i + 1,
+          url,
+          message: err instanceof Error ? err.message : 'Failed to import problem',
+        });
+      }
+    }
+
+    if (created.length > 0) {
+      await AuditLog.create({
+        actorId: user._id,
+        action: AuditAction.QUESTIONS_IMPORTED,
+        targetType: 'Question',
+        metadata: {
+          source: 'bulk_urls',
+          count: created.length,
+          duplicates,
+          failed,
+          total: data.urls.length,
+        },
+      });
+    }
+
+    return {
+      imported: created.length,
+      duplicates,
+      failed,
+      total: data.urls.length,
+      questions: created,
+      errors,
+    };
   }
 
   // ─── Import from CSV ─────────────────────────────────────

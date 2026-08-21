@@ -44,7 +44,25 @@ export const updateQuestionSetSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+export const bulkCreateQuestionsSchema = z.union([
+  z.object({
+    questions: z.array(createQuestionSchema).min(1, 'At least one question is required'),
+  }),
+  z.array(createQuestionSchema).min(1, 'At least one question is required'),
+]);
+
+export const importBulkUrlsSchema = z.object({
+  urls: z.array(z.string().url('Invalid problem URL')).min(1, 'At least one URL is required'),
+  defaultDifficulty: z.enum(['EASY', 'MEDIUM', 'HARD', 'EXPERT']).optional(),
+  topics: z.array(z.string()).optional(),
+  companies: z.array(z.string()).optional(),
+  points: z.number().int().min(0).optional(),
+});
+
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;
 export type UpdateQuestionInput = z.infer<typeof updateQuestionSchema>;
 export type ImportUrlInput = z.infer<typeof importUrlSchema>;
+export type BulkCreateQuestionsInput = z.infer<typeof bulkCreateQuestionsSchema>;
+export type ImportBulkUrlsInput = z.infer<typeof importBulkUrlsSchema>;
 export type CreateQuestionSetInput = z.infer<typeof createQuestionSetSchema>;
+

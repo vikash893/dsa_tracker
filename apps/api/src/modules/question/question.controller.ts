@@ -15,6 +15,17 @@ export class QuestionController {
     } catch (error) { next(error); }
   }
 
+  async createBulk(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await questionService.createBulk(req.body, req.user!);
+      res.status(201).json({
+        success: true,
+        message: `Successfully imported ${result.imported} question(s)${result.duplicates ? `, skipped ${result.duplicates} duplicate(s)` : ''}${result.failed ? `, ${result.failed} failed` : ''}`,
+        data: result,
+      });
+    } catch (error) { next(error); }
+  }
+
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await questionService.list({
@@ -55,6 +66,17 @@ export class QuestionController {
     try {
       const result = await questionService.importFromUrl(req.body, req.user!);
       res.status(201).json({ success: true, message: 'Question imported from URL', data: result });
+    } catch (error) { next(error); }
+  }
+
+  async importBulkUrls(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await questionService.importBulkUrls(req.body, req.user!);
+      res.status(201).json({
+        success: true,
+        message: `Successfully imported ${result.imported} question(s)${result.duplicates ? `, skipped ${result.duplicates} duplicate(s)` : ''}${result.failed ? `, ${result.failed} failed` : ''}`,
+        data: result,
+      });
     } catch (error) { next(error); }
   }
 

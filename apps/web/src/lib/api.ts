@@ -21,3 +21,21 @@ export async function api<T = any>(endpoint: string, method: Method = 'GET', bod
   if (!res.ok) throw new Error(data.message || 'Request failed');
   return data;
 }
+
+export async function apiUpload<T = any>(endpoint: string, formData: FormData): Promise<T> {
+  const token = localStorage.getItem('token');
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+    credentials: 'include',
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Request failed');
+  return data;
+}
+

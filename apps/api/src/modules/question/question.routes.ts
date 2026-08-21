@@ -12,6 +12,7 @@ import { requireAdmin } from '../../middleware/rbac.js';
 import { validate } from '../../middleware/validate.js';
 import {
   createQuestionSchema, updateQuestionSchema, importUrlSchema,
+  bulkCreateQuestionsSchema, importBulkUrlsSchema,
   createQuestionSetSchema, updateQuestionSetSchema,
 } from './question.validation.js';
 
@@ -37,6 +38,7 @@ router.use(authenticate);
 
 // Questions CRUD
 router.post('/', requireAdmin, validate({ body: createQuestionSchema }), (req, res, next) => questionController.create(req, res, next));
+router.post('/bulk', requireAdmin, validate({ body: bulkCreateQuestionsSchema }), (req, res, next) => questionController.createBulk(req, res, next));
 router.get('/', (req, res, next) => questionController.list(req, res, next));
 router.get('/search', (req, res, next) => questionController.search(req, res, next));
 router.get('/:id', (req, res, next) => questionController.getById(req, res, next));
@@ -45,6 +47,7 @@ router.delete('/:id', requireAdmin, (req, res, next) => questionController.delet
 
 // Import
 router.post('/import/url', requireAdmin, validate({ body: importUrlSchema }), (req, res, next) => questionController.importFromUrl(req, res, next));
+router.post('/import/urls', requireAdmin, validate({ body: importBulkUrlsSchema }), (req, res, next) => questionController.importBulkUrls(req, res, next));
 router.post('/import/excel', requireAdmin, upload.single('file'), (req, res, next) => questionController.importFromCsv(req, res, next));
 router.post('/import/pdf', requireAdmin, upload.single('file'), (req, res, next) => questionController.importFromPdf(req, res, next));
 
